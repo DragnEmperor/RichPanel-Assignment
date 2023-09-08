@@ -1,5 +1,6 @@
 import React, {createContext} from "react";
 import API from "./api";
+import {toast} from 'react-hot-toast';
 
 let AuthContext;
 const { Provider, Consumer } = (AuthContext = createContext());
@@ -51,48 +52,52 @@ class AuthProvider extends React.PureComponent {
       }
     }
     
-    login = (email, password, history, setIsLoading, setErrorMessage) => {
+    login = (email, password, history, setIsLoading,setToastMessage) => {
       setIsLoading(true);
-      this.setLogin(null)
+      this.setLogin(null);
       // !! to convert to boolean: 0,null or undefined is false rest is true
       if (!!email && !!password) {
         API.auth().login({ email, password })
         .then(res=>{
-          if(res.data.error)
-            setErrorMessage(res.data.error)
-          this.setLogin(res.data)
-          history('/dashboard')
+          if(!res.data.status){
+            console.log('error',res)
+            toast.error(res.data.message)
+          }
+          else {
+            this.setLogin(res.data)
+            history('/fbIntegrate')
+          }
         })
-        setIsLoading(false)
-        setErrorMessage(null)
+        setIsLoading(false);
       } else {
         setIsLoading(false);
-        setErrorMessage("email and password is empty")
+        toast.error("email and password is empty")
         return false
       }
     }
     
-    register = (email, name, password,secretCode, history, setIsLoading, setErrorMessage) => {
+    register = (email, name, password, history, setIsLoading) => {
       setIsLoading(true);
     
       if (!!email && !!name && !!password) {
-        console.log(email, name, password,secretCode);
-        API.auth().register({ email, name, password,secretCode })
+        API.auth().register({ email, name, password })
             .then(res => {
               console.log('signupres',res)
+              if(!res.data.status){
+                toast.error(res.data.message)
+                return;
+              }
               localStorage.setItem('mypegtoken', res.data.token)
               localStorage.setItem('authpegUser', JSON.stringify(res.data.user))
-              setErrorMessage(null)
               setIsLoading(false);
-              history('/dashboard')
+              history('/fbIntegrate')
             })
             .catch(err => {
-              console.log(err)
-              setErrorMessage(err.message)
+              toast.error(err.response.data.message)
               setIsLoading(false);
             });
       } else {
-        setErrorMessage("All field is required")
+        toast.error("All field is required");
         setIsLoading(false);
       }
     }
@@ -107,6 +112,11 @@ class AuthProvider extends React.PureComponent {
       localStorage.removeItem("authpegUser");
       API.auth().logout()
       history("/login");
+    }
+
+    fbLogin = (history)=>{
+      console.log('fbcalled');
+      
     }
 
     render() {

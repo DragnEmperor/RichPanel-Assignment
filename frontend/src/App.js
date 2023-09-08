@@ -14,7 +14,7 @@ function App() {
         <Route exact path="/login" element={<Login />} />
         <Route exact path="/register" element={<Register />} />
         <Route exact path="/fbIntegrate" element={<FBIntegrate />} />
-        <Route exact path="/dashboard" element={<Dashboard />} />
+        <Route exact path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       </Routes>
     </Router>
   );

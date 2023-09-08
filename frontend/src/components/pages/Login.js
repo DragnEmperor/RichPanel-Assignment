@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../auth/context";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const Login = () => {
-    const { getAuthUser } = useContext(AuthContext);
+    const { getAuthUser,login } = useContext(AuthContext);
     const navigate = useNavigate();
     const user = getAuthUser();
     const [userData, setUserData] = useState({ name: '', email: '', password: '' });
+    const [isLoading, setIsLoading] = useState(false);
 
     const updateUserData = (e) => {
         setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -15,12 +17,15 @@ const Login = () => {
 
     useEffect(() => {
         if (user)
-            navigate('/dashboard');
+            navigate('/fbIntegrate');
     }, [user]);
 
     const submitHandler = (e) => {
-
+     e.preventDefault();
+     console.log('halo',userData)
+     login(userData.email,userData.password,navigate,setIsLoading)
     }
+
 
     return (
         <React.Fragment>
