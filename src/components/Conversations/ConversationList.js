@@ -18,7 +18,7 @@ const dummyConversations = [
     },
 ];
 
-const ConversationList = () => {
+const ConversationList = ({ selectedConversation, setSelectedConversation }) => {
 
     const sortedConversationsDescending = dummyConversations.sort((a, b) => {
         const timeA = parseInt(a.timeAgo);
@@ -33,7 +33,7 @@ const ConversationList = () => {
 
     return (<React.Fragment>
 
-        <div className="flex items-center justify-between border-b-2 border-b-gray-300 py-6 px-8">
+        <div className="flex items-center justify-between border-b-2 border-b-gray-300 py-5 px-8">
             <div className="flex gap-6 items-center">
                 <AiOutlineAlignLeft className="w-6 h-6" />
                 <h1 className="text-3xl font-bold ">Conversations</h1>
@@ -41,14 +41,14 @@ const ConversationList = () => {
             <AiOutlineReload onClick={handleReload} className="w-6 h-6" />
         </div>
         {sortedConversationsDescending.map((conversation, index) => (
-            <div className="flex flex-col px-8 gap-4 py-4 hover:bg-gray-100 cursor-pointer text-black">
+            <div key={index} className={`flex flex-col px-8 gap-4 py-4 hover:bg-gray-100 cursor-pointer text-black ${selectedConversation === index ? " bg-gray-100" : " "}`} onClick={() => setSelectedConversation(index)}>
                 <div className="flex justify-between ">
                     <div className="flex items-center gap-6">
                         <input
                             type="checkbox"
                             id="conversation"
                             name="conversation"
-                            className="appearance-none w-5 h-5 border-2 border-gray-400 shadow rounded"
+                            className=" w-5 h-5 !border-2 border-gray-400 shadow rounded checked:bg-blue-800 checked:border-0"
                         />
                         <div>
                             <p className="text-lg font-semibold">{conversation.name}</p>

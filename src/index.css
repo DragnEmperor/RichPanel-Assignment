@@ -5,3 +5,35 @@
 svg{
     display: inline;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* For IE, Edge and Firefox */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
+}
+  
+::-webkit-scrollbar-track {
+    border-radius: 100vh !important;
+    background: #c8b9b9 !important;
+}
+  
+::-webkit-scrollbar-thumb {
+    background: #ffffff !important;
+    border-radius: 100vh !important;
+    border: 20px solid #363636 !important;
+}
+  
+-webkit-scrollbar-thumb:hover {
+    background: #c0a0b9 !important;
+}
