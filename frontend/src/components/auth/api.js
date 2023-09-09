@@ -30,7 +30,7 @@ export default {
 
   fbLogin(url = '') {
     return {
-        getAccessToken: ({code}) =>{
+        getCompleteData: ({code}) =>{
           return http.post('/facebook/getCompleteData',{code})
         },
         getUserId: ({accessToken}) =>{

@@ -1,30 +1,27 @@
 import React, { useState } from "react";
 import { AiOutlineAlignLeft, AiOutlineReload } from 'react-icons/ai';
 
-const dummyConversations = [
-    {
-        name: "Aman",
-        platform: "Facebook DM",
-        msgHead: "Hey, I have a question",
-        msgBody: "I have a question about my order. Can you help me? Hallsdakod hjhdfhaw hjaihdoahdfao ndhadhoaafaa da wda da a adf ad a ad a",
-        timeAgo: "2m",
-    },
-    {
-        name: "Parth",
-        platform: "Facebook Page",
-        msgHead: "Are you there?",
-        msgBody: "Haallooooo!!! My selffff Parth kaushik from Chandigarh.Hfafnahfdahfiabuirh ai iahfiuqahfillsdakod hjhdfhaw hjaihdoahdfao ndhadhoaafaa da wda da a adf ad a ad a",
-        timeAgo: "10m",
-    },
-];
+function calculateTimePassed(iso8601Timestamp) {
+    const timestampDate = new Date(iso8601Timestamp);
+    const currentDate = new Date();
+    const timeDifferenceMs = currentDate - timestampDate;
+    const minutesPassed = Math.floor(timeDifferenceMs / (1000 * 60));
+    if (minutesPassed >= 60) {
+      const hours = Math.floor(minutesPassed / 60);
+      return `${hours}h`;
+    } else {
+      return `${minutesPassed}m`;
+    }
+  }
 
-const ConversationList = ({ selectedConversation, setSelectedConversation }) => {
+const ConversationList = ({ selectedConversation, setSelectedConversation, pageConversations }) => {
 
-    const sortedConversationsDescending = dummyConversations.sort((a, b) => {
-        const timeA = parseInt(a.timeAgo);
-        const timeB = parseInt(b.timeAgo);
-
-        return timeB - timeA;
+    pageConversations.forEach((conversation) => {
+        conversation.messages.sort((a, b) => {
+            const timeA = new Date(a.created_time).getTime();
+            const timeB = new Date(b.created_time).getTime();
+            return timeA - timeB;
+        });
     });
 
     const handleReload = () => {
@@ -32,7 +29,6 @@ const ConversationList = ({ selectedConversation, setSelectedConversation }) => 
     }
 
     return (<React.Fragment>
-
         <div className="flex items-center justify-between border-b-2 border-b-gray-300 py-5 px-8">
             <div className="flex gap-6 items-center">
                 <AiOutlineAlignLeft className="w-6 h-6" />
@@ -40,7 +36,10 @@ const ConversationList = ({ selectedConversation, setSelectedConversation }) => 
             </div>
             <AiOutlineReload onClick={handleReload} className="w-6 h-6" />
         </div>
-        {sortedConversationsDescending.map((conversation, index) => (
+        {pageConversations.map((conversation, index) => {
+            const timePassed = calculateTimePassed(conversation.messages[0].created_time);
+            const username = (conversation.participants.find((item)=>item.id!==conversation.pageId)).name;
+            return(
             <div key={index} className={`flex flex-col px-8 gap-4 py-4 hover:bg-gray-100 cursor-pointer text-black ${selectedConversation === index ? " bg-gray-100" : " "}`} onClick={() => setSelectedConversation(index)}>
                 <div className="flex justify-between ">
                     <div className="flex items-center gap-6">
@@ -51,18 +50,18 @@ const ConversationList = ({ selectedConversation, setSelectedConversation }) => 
                             className=" w-5 h-5 !border-2 border-gray-400 shadow rounded checked:bg-blue-800 checked:border-0"
                         />
                         <div>
-                            <p className="text-lg font-semibold">{conversation.name}</p>
-                            <p className="text-[0.95rem] font-semibold">{conversation.platform}</p>
+                            <p className="text-lg font-semibold">{username}</p>
+                            <p className="text-[0.95rem] font-semibold">{conversation.type==='page'?'Facebook Post':"Facebook DM"}</p>
                         </div>
                     </div>
-                    <p className="text-base text-gray-600 font-semibold">{conversation.timeAgo}</p>
+                    <p className="text-base text-gray-600 font-semibold">{timePassed}</p>
                 </div>
                 <div>
-                    <p className="text-base font-semibold">{conversation.msgHead}</p>
-                    <p className="text-base text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">{conversation.msgBody}</p>
+                    {/* <p className="text-base font-semibold">{timePassed}</p> */}
+                    <p className="text-base text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">{conversation.messages[0].message}</p>
                 </div>
             </div>
-        ))}
+       )})}
     </React.Fragment>
     )
 }

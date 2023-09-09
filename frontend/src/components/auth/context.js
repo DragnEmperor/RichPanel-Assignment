@@ -10,7 +10,7 @@ class AuthProvider extends React.PureComponent {
         token : null,
         authUser: null,
         errorMsg : null,
-        fbUserId:null
+        fbPageData:null
     };
 
     isAuthenticated = () => {
@@ -34,8 +34,8 @@ class AuthProvider extends React.PureComponent {
       }
     }
 
-    getFBUserId = () => {
-      const usr = this.state.fbUserId ? this.state.fbUserId : localStorage.getItem("fbPegUserId");
+    getFBPageData = () => {
+      const usr = this.state.fbPageData ? this.state.fbPageData : localStorage.getItem("fbPegPageData");
       if (!usr) return null
 
       try {
@@ -142,7 +142,7 @@ class AuthProvider extends React.PureComponent {
     }
 
     getFBData = (code,history)=>{
-      API.fbLogin().getAccessToken({code})
+      API.fbLogin().getCompleteData({code})
       .then(res=>{
         // API.fbLogin().getUserId({accessToken:res.data.fbToken})
         // .then(res=>{
@@ -155,12 +155,14 @@ class AuthProvider extends React.PureComponent {
           return;
         }
         localStorage.setItem('fbPegToken', res.data.fbToken)
+        localStorage.setItem('fbPegPageData', JSON.stringify(res.data?.pageData[0]))
         history('/fbIntegrate');
       })
     }
 
     removeFBData = (history) => {
       localStorage.removeItem("fbPegToken");
+      localStorage.removeItem("fbPegPageData");
       history('/fbIntegrate');
     }
 
@@ -176,7 +178,8 @@ class AuthProvider extends React.PureComponent {
               getAuthUser : this.getAuthUser,
               getFBData: this.getFBData,
               getFBToken: this.getFBToken,
-              removeFBData: this.removeFBData
+              removeFBData: this.removeFBData,
+              getFBPageData: this.getFBPageData
           }}
         >
           {this.props.children}
