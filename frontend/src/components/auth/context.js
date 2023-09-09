@@ -9,7 +9,8 @@ class AuthProvider extends React.PureComponent {
     state = {
         token : null,
         authUser: null,
-        errorMsg : null
+        errorMsg : null,
+        fbUserId:null
     };
 
     isAuthenticated = () => {
@@ -22,6 +23,32 @@ class AuthProvider extends React.PureComponent {
 
     getAuthUser = () => {
       const usr = this.state.authUser ? this.state.authUser : localStorage.getItem("authpegUser")
+      if (!usr) return null
+
+      try {
+        const parsed = JSON.parse(usr)
+        return parsed
+      }
+      catch(err) {
+        return usr
+      }
+    }
+
+    getFBUserId = () => {
+      const usr = this.state.fbUserId ? this.state.fbUserId : localStorage.getItem("fbPegUserId");
+      if (!usr) return null
+
+      try {
+        const parsed = JSON.parse(usr)
+        return parsed
+      }
+      catch(err) {
+        return usr
+      }
+    }
+
+    getFBToken = () => {
+      const usr = localStorage.getItem("fbPegToken")
       if (!usr) return null
 
       try {
@@ -114,9 +141,27 @@ class AuthProvider extends React.PureComponent {
       history("/login");
     }
 
-    fbLogin = (history)=>{
-      console.log('fbcalled');
-      
+    getFBData = (code,history)=>{
+      API.fbLogin().getAccessToken({code})
+      .then(res=>{
+        // API.fbLogin().getUserId({accessToken:res.data.fbToken})
+        // .then(res=>{
+        //   localStorage.setItem('fbPegUserId', res.data.userId?.id)
+        //   this.setState({fbUserId:res.data.userId?.id})
+        // }).catch(err=>console.log('err',err))
+
+        if(!res.data.status){
+          toast.error(res.data.message)
+          return;
+        }
+        localStorage.setItem('fbPegToken', res.data.fbToken)
+        history('/fbIntegrate');
+      })
+    }
+
+    removeFBData = (history) => {
+      localStorage.removeItem("fbPegToken");
+      history('/fbIntegrate');
     }
 
     render() {
@@ -128,7 +173,10 @@ class AuthProvider extends React.PureComponent {
               register : this.register,
               logout : this.logout,
               isAuthenticated : this.isAuthenticated,
-              getAuthUser : this.getAuthUser
+              getAuthUser : this.getAuthUser,
+              getFBData: this.getFBData,
+              getFBToken: this.getFBToken,
+              removeFBData: this.removeFBData
           }}
         >
           {this.props.children}

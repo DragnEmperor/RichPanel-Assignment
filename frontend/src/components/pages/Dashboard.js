@@ -9,11 +9,12 @@ import { toast } from "react-hot-toast";
 
 const Dashboard = () => {
 
-    const {getAuthUser, logout} = useContext(AuthContext);
+    const {getAuthUser, logout, getFBToken} = useContext(AuthContext);
     const navigate = useNavigate();
     const user = getAuthUser();
     const [activeIndex, setActiveIndex] = useState(1);
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+    const fbAccessToken = getFBToken();
 
     const toggleSubMenu = () => {
         setIsSubMenuOpen(!isSubMenuOpen);

@@ -1,2 +1,6 @@
 node_modules
 .env
+localhost.pem
+localhost-key.pem
+rootCA.key
+env.js
