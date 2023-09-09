@@ -2,37 +2,56 @@ import React, { useContext, useEffect, useState } from "react";
 import DashboardBody from "../dashboardBody/DashBoardBody";
 import { AuthContext } from "../auth/context";
 import { toast } from "react-hot-toast";
-import axios from "axios";
 import SideBar from "../sidebar/SideBar";
 
 const Dashboard = () => {
 
-    const {getAuthUser, getFBToken,getFBPageData} = useContext(AuthContext);
+    const { getAuthUser, getFBPageData, getPageConversations } = useContext(AuthContext);
     const user = getAuthUser();
-    const [pageConversations,setPageConversations] = useState([]);
-    const fbAccessToken = getFBToken();
+    const [pageConversations, setPageConversations] = useState([]);
+    // const fbAccessToken = getFBToken();
     const fbPageData = getFBPageData();
 
-    const getPageConversations=async()=>{
-       const response = await axios.post('https://localhost:5000/facebook/getConversations',{pageId:fbPageData?.id});
-       console.log('dashboard',response);
-       setPageConversations(response.data.conversations);
+    const setConversationswithUrl = async (data) => {
+        if (data) {
+            const conversationsWithPicUrl = await Promise.all(
+                data?.map(async (conversation) => {
+                    const participantsWithPicUrl = await Promise.all(
+                        conversation.participants.map(async (participant) => {
+                            const response = await fetch(`https://graph.facebook.com/${participant.id}/?fields=picture{url}&access_token=${fbPageData?.access_token}`);
+                            const data = await response.json();
+                            return {
+                                ...participant,
+                                picUrl: data?.picture?.data.url
+                            };
+                        })
+                    );
+
+                    return {
+                        ...conversation,
+                        participants: participantsWithPicUrl
+                    };
+                })
+            );
+            setPageConversations(conversationsWithPicUrl);
+        }
     }
 
-      useEffect(()=>{
-        if(user!==null)
-        toast.success('Welcome to Dashboard');
-      },[user])
+    const reloadConversations = async (id, token) => {
+        const data = await getPageConversations(id, token);
+        setConversationswithUrl(data);
+    }
+    useEffect(() => {
+        if (fbPageData?.name.length > 1) {
+            reloadConversations(fbPageData?.id, fbPageData?.access_token);
+        }
+    }, [])
 
-      useEffect(()=>{
-        if(fbPageData?.name.length>1)
-          getPageConversations();
-      },[])
 
     return (
         <section className="flex w-screen h-screen">
-            <SideBar/>
-            <DashboardBody pageConversations={pageConversations}/>
+            <SideBar />
+            <DashboardBody pageConversations={pageConversations} reloadConversations={reloadConversations} />
         </section>
     )
 }

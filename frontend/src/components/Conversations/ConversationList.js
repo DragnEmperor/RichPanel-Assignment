@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { AiOutlineAlignLeft, AiOutlineReload } from 'react-icons/ai';
+import { AuthContext } from "../auth/context";
+import axios from "axios";
 
 function calculateTimePassed(iso8601Timestamp) {
     const timestampDate = new Date(iso8601Timestamp);
@@ -14,18 +16,23 @@ function calculateTimePassed(iso8601Timestamp) {
     }
   }
 
-const ConversationList = ({ selectedConversation, setSelectedConversation, pageConversations }) => {
+const ConversationList = ({ selectedConversation, setSelectedConversation, pageConversations,reloadConversations }) => {
 
-    pageConversations.forEach((conversation) => {
-        conversation.messages.sort((a, b) => {
+    const {  getFBPageData} = useContext(AuthContext);
+    const fbPageData = getFBPageData();
+
+    pageConversations?.forEach((conversation) => {
+        conversation?.messages?.sort((a, b) => {
             const timeA = new Date(a.created_time).getTime();
             const timeB = new Date(b.created_time).getTime();
             return timeA - timeB;
         });
     });
 
-    const handleReload = () => {
-
+    const handleReload = async() => {
+        const response = await axios.post('https://localhost:5000/facebook/reloadConversations',{fbPageData})
+        if(response.data.status)
+        reloadConversations(fbPageData?.id, fbPageData?.access_token);
     }
 
     return (<React.Fragment>
@@ -34,11 +41,13 @@ const ConversationList = ({ selectedConversation, setSelectedConversation, pageC
                 <AiOutlineAlignLeft className="w-6 h-6" />
                 <h1 className="text-3xl font-bold ">Conversations</h1>
             </div>
-            <AiOutlineReload onClick={handleReload} className="w-6 h-6" />
+            <AiOutlineReload onClick={handleReload} className="w-6 h-6 cursor-pointer" />
         </div>
         {pageConversations.map((conversation, index) => {
-            const timePassed = calculateTimePassed(conversation.messages[0].created_time);
-            const username = (conversation.participants.find((item)=>item.id!==conversation.pageId)).name;
+
+            const timePassed = calculateTimePassed(conversation?.messages?.[0]?.created_time);
+            const username = (conversation?.participants?.find((item)=>item.id!==conversation?.pageId))?.name;
+
             return(
             <div key={index} className={`flex flex-col px-8 gap-4 py-4 hover:bg-gray-100 cursor-pointer text-black ${selectedConversation === index ? " bg-gray-100" : " "}`} onClick={() => setSelectedConversation(index)}>
                 <div className="flex justify-between ">
@@ -58,7 +67,7 @@ const ConversationList = ({ selectedConversation, setSelectedConversation, pageC
                 </div>
                 <div>
                     {/* <p className="text-base font-semibold">{timePassed}</p> */}
-                    <p className="text-base text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">{conversation.messages[0].message}</p>
+                    <p className="text-base text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">{conversation?.messages?.[conversation.messages.length-1].message}</p>
                 </div>
             </div>
        )})}

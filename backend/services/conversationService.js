@@ -25,24 +25,32 @@ const processConversations=async(fbPageData)=>{
         const existingConversation = await Conversation.findOne({conversationId:conversation.convId});
         if(existingConversation){
             const lastMessageExisting = existingConversation.messages[existingConversation.messages.length - 1];
-            const cutoffTime = new Date(lastMessageExisting.created_time).getTime() + 24 * 60 * 60 * 1000; // 24 hours in ms
-             // Find the index of the message that has created_time more than 24 hours
-            const newIndex = conversation.messages.findIndex((message) => {
+            const cutoffTime = new Date(lastMessageExisting.created_time).getTime() // 24 hours in ms
+             // Find the messages that has created_time more than 24 hours
+            const newMessages = conversation.messages.filter((message) => {
                 const messageTime = new Date(message.created_time).getTime();
-                return messageTime > cutoffTime;
+                return messageTime > (cutoffTime + 24 * 60 * 60 * 1000);
             });
 
-            if (newIndex !== -1) {
-                // Create a new conversation starting from the new index
+            if(newMessages.length >0){
                 session.startTransaction();
-                const newMessages = conversation.messages.slice(newIndex);
                 const newConversation = new Conversation({
                     pageId: fbPageData?.id,
                     conversationId: conversation.convId,
                     messages: newMessages,
                     participants: conversation.participants
                 });
-                await newConversation.save({session});
+                await newConversation.save({session})
+                await session.commitTransaction();
+            }
+            const oldMessages = conversation.messages.filter((message) => {
+                const messageTime = new Date(message.created_time).getTime();
+                return (messageTime - cutoffTime)>0 && (messageTime<=(cutoffTime+ 24 * 60 * 60 * 1000));
+            });
+            if(oldMessages.length>0){
+                session.startTransaction();
+                existingConversation.messages.push(...oldMessages);
+                await existingConversation.save({session});
                 await session.commitTransaction();
             }
             continue;

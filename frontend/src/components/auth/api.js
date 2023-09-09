@@ -33,6 +33,9 @@ export default {
         getCompleteData: ({code}) =>{
           return http.post('/facebook/getCompleteData',{code})
         },
+        getConversations : ({pageId,accessToken}) =>{
+          return http.post('/facebook/getConversations',{pageId,accessToken})
+        },
         getUserId: ({accessToken}) =>{
           return http.post('/facebook/getuserId',{accessToken})
         },

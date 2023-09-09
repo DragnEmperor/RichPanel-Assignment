@@ -47,15 +47,17 @@ router.post('/facebook/getCompleteData', async (req, res) => {
             method: 'GET',
         });
         const data = await response.json();
-        //for long term access token
-        //   const queryParams1 = new URLSearchParams({
-        //     client_id: process.env.FB_APP_ID,
-        //     client_secret: process.env.FB_SECRET,
-        //     fb_exchange_token:data.access_token
-        //   });
-        //   const url1 = `https://graph.facebook.com/v17.0/oauth/access_token?grant_type=fb_exchange_token&${queryParams1}`;
-        //   const response1 = await await axios.get(url1);
-        //   const data1 = await response1.json();
+        // for long term access token
+        const queryParams1 = new URLSearchParams({
+            client_id: process.env.FB_APP_ID,
+            client_secret: process.env.FB_SECRET,
+            fb_exchange_token:data.access_token
+          });
+        const url1 = `https://graph.facebook.com/v17.0/oauth/access_token?grant_type=fb_exchange_token&${queryParams1}`;
+        const response1 =  await fetch(url1, {
+            method: 'GET',
+        });
+        const data1 = await response1.json();
         const url2 = `https://graph.facebook.com/v17.0/me?fields=id&access_token=${data.access_token}`;
         const response2 = await fetch(url2, {
             method: 'GET',
@@ -69,9 +71,9 @@ router.post('/facebook/getCompleteData', async (req, res) => {
         });
         const data3 = await response3.json();
         console.log('tesitng at abckend', data3)
-        const isComplete = await processConversations(data3.data[0]);
+        await processConversations(data3.data[0]);
         
-        return res.status(200).send({ status: true, fbToken: data.access_token, pageData: data3.data })
+        return res.status(200).send({ status: true, fbToken: data1.access_token, pageData: data3.data })
     }
     catch (error) {
         res.status(400).send({ status: false, error: error.message })
@@ -94,14 +96,44 @@ router.post('/facebook/getuserId', async (req, res) => {
 
 router.post('/facebook/getConversations', async (req, res) => {
     try {
-        const { pageId } = req.body;
-        const conversations = await Conversation.find({ pageId });
-        console.log('conversations', conversations);
-        return res.status(200).send({ status: true, conversations });
+        const { pageId, accessToken } = req.body;
+        const allConversations = await Conversation.find({ pageId });
+        console.log('conversations', allConversations);
+        return res.status(200).send({ status: true, conversations:allConversations });
     }
     catch (error) {
         res.status(400).send({ status: false, error: error.message })
     }
 });
+
+router.post('/facebook/reloadConversations',async(req,res)=>{
+    try{
+        const {fbPageData} = req.body;
+        await processConversations(fbPageData);
+        return res.status(200).send({status:true,message:'Conversations Reloaded!'});
+    }catch(error){
+        res.status(400).send({status:false,error:error.message});
+    }
+})
+
+router.post('/facebook/sendMessage',async(req,res)=>{
+    try{
+        const {receiverId, text, pageData} = req.body;
+        const queryParams = new URLSearchParams({
+            recipient : JSON.stringify({ id: receiverId }),
+            message : JSON.stringify({ text }),
+            messaging_type : 'RESPONSE',
+            access_token : pageData.access_token
+          });
+        const url = `https://graph.facebook.com/${pageData.id}/messages?${queryParams}`;
+        const response = await fetch(url,{
+            method:'POST',
+        });
+        const data = await response.json();
+        return res.status(200).send({status:true,message:'Message Sent!',data});
+    }catch(error){
+        res.status(400).send({status:false,error:error.message});
+    }
+})
 
 module.exports = router;

@@ -160,6 +160,15 @@ class AuthProvider extends React.PureComponent {
       })
     }
 
+    getPageConversations= async (pageId,accessToken)=>{
+      return API.fbLogin().getConversations({pageId,accessToken})
+      .then(response=>{
+      console.log('dashboard',response);
+      return response.data.conversations;
+      }).catch(err=>console.log('err',err))
+      // setPageConversations(conversationsWithPicUrl);
+   }
+
     removeFBData = (history) => {
       localStorage.removeItem("fbPegToken");
       localStorage.removeItem("fbPegPageData");
@@ -179,7 +188,8 @@ class AuthProvider extends React.PureComponent {
               getFBData: this.getFBData,
               getFBToken: this.getFBToken,
               removeFBData: this.removeFBData,
-              getFBPageData: this.getFBPageData
+              getFBPageData: this.getFBPageData,
+              getPageConversations: this.getPageConversations
           }}
         >
           {this.props.children}

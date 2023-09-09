@@ -19,17 +19,18 @@ function formatDate(inputDate) {
     return formattedDate;
   }
 
-const Message = ({ message }) => {
+const Message = ({ message, participants }) => {
     const { getFBPageData } = useContext(AuthContext);
     const formattedTime = formatDate(message?.created_time);
     const pageData = getFBPageData();
+    const senderPic = (participants?.find((item)=>item.id!==pageData?.id))?.picUrl;
+    const receiverPic = (participants?.find((item)=>item.id===pageData?.id))?.picUrl;
 
-    console.log(message)
     return (
-        <div className={` w-fit ${message?.from.id===pageData.id ? " ml-auto mr-6" : "ml-6 "}`}>
+        <div className={` w-fit py-2 ${message?.from.id===pageData.id ? " ml-auto mr-6" : "ml-6 "}`}>
             <div className={`flex gap-2 ${message?.from.id===pageData.id ? " flex-row-reverse " : ""}`}>
                 <div className="relative top-2">
-                    <img src="https://images.unsplash.com/photo-1693693928634-658db91ca093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80" alt="user-icon" className="w-10 h-10 object-cover rounded-full" />
+                    <img src={message?.from.id===pageData.id ? receiverPic: senderPic} alt="user-icon" className="w-10 h-10 object-cover rounded-full" />
                 </div>
                 <div>
                     <div className="bg-white p-4 border-2 rounded-lg">
