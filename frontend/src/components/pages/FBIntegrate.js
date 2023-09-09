@@ -51,7 +51,7 @@ const FBIntegrate = () => {
                         :
                         (<div className="flex flex-col gap-4">
                             <h6 className="text-xl text-center font-semibold">Facebook Page Integration</h6>
-                            <Link to={env.BACKEND_URL+'facebook/login'} className="bg-[#004f97] p-4 w-96 text-white text-center text-lg rounded-md">
+                            <Link to={process.env.BACKEND_URL+'facebook/login'} className="bg-[#004f97] p-4 w-96 text-white text-center text-lg rounded-md">
                                 Connect Page
                             </Link>
                         </div>)

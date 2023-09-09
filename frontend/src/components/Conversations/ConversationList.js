@@ -31,7 +31,7 @@ const ConversationList = ({ selectedConversation, setSelectedConversation, pageC
     });
 
     const handleReload = async() => {
-        const response = await axios.post(env.BACKEND_URL+'facebook/reloadConversations',{fbPageData})
+        const response = await axios.post(process.env.BACKEND_URL+'facebook/reloadConversations',{fbPageData})
         if(response.data.status)
         reloadConversations(fbPageData?.id, fbPageData?.access_token);
     }

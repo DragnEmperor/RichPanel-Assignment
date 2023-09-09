@@ -4,7 +4,7 @@ import env from "react-dotenv";
 
 
 const http = axios.create({
-  baseURL: env.BACKEND_URL,
+  baseURL: process.env.BACKEND_URL,
   headers: {
     "Content-type": "application/json",
   },
