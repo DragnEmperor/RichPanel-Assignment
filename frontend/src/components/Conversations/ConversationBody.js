@@ -3,6 +3,7 @@ import Message from "./Message";
 import { AuthContext } from "../auth/context";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import env from "react-dotenv";
 
 const ConversationBody = ({ displayConversation, reloadConversations}) => {
     const [message, setMessage] = useState("");
@@ -22,7 +23,7 @@ const ConversationBody = ({ displayConversation, reloadConversations}) => {
 
       const submitData = async() => {
         console.log('Submitted:', message);
-        const response = await axios.post('https://localhost:5000/facebook/sendMessage',{receiverId, text:message, pageData:fbPageData});
+        const response = await axios.post(env.BACKEND_URL+'facebook/sendMessage',{receiverId, text:message, pageData:fbPageData});
         if(response?.data?.data?.error?.message.length>0){
             toast.error(response?.data?.data?.error?.message);
         }

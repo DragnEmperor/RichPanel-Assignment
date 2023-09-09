@@ -1,11 +1,10 @@
 /* eslint-disable */ 
 import axios from "axios";
-import queryString from "query-string";
-
+import env from "react-dotenv";
 
 
 const http = axios.create({
-  baseURL: 'https://localhost:5000/',
+  baseURL: env.BACKEND_URL,
   headers: {
     "Content-type": "application/json",
   },
