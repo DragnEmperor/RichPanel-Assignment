@@ -23,7 +23,6 @@ const ConversationBody = ({ displayConversation, reloadConversations}) => {
       const submitData = async() => {
         console.log('Submitted:', message);
         const response = await axios.post('https://localhost:5000/facebook/sendMessage',{receiverId, text:message, pageData:fbPageData});
-        console.log('response',response);
         if(response?.data?.data?.error?.message.length>0){
             toast.error(response?.data?.data?.error?.message);
         }

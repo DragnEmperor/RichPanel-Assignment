@@ -22,7 +22,6 @@ const Register = () => {
 
     const submitHandler = (e) => {
      e.preventDefault();
-     console.log('halo',userData)
      register(userData.email,userData.name,userData.password,navigate,setIsLoading)
     }
 

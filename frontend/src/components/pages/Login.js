@@ -22,7 +22,6 @@ const Login = () => {
 
     const submitHandler = (e) => {
      e.preventDefault();
-     console.log('halo',userData)
      login(userData.email,userData.password,navigate,setIsLoading)
     }
 

@@ -70,7 +70,6 @@ router.post('/facebook/getCompleteData', async (req, res) => {
             method: 'GET',
         });
         const data3 = await response3.json();
-        console.log('tesitng at abckend', data3)
         await processConversations(data3.data[0]);
         
         return res.status(200).send({ status: true, fbToken: data1.access_token, pageData: data3.data })
@@ -86,7 +85,6 @@ router.post('/facebook/getuserId', async (req, res) => {
         const url = `https://graph.facebook.com/v17.0/me?fields=id&access_token=${accessToken}`;
         const response = await axios.get(url);
         const data = await response.json();
-        console.log('userId', data)
         return res.status(200).send({ status: true, userId: data })
     }
     catch (error) {
@@ -98,7 +96,6 @@ router.post('/facebook/getConversations', async (req, res) => {
     try {
         const { pageId, accessToken } = req.body;
         const allConversations = await Conversation.find({ pageId });
-        console.log('conversations', allConversations);
         return res.status(200).send({ status: true, conversations:allConversations });
     }
     catch (error) {

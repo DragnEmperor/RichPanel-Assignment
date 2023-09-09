@@ -8,7 +8,6 @@ const UserDetails = ({ displayConversation }) => {
     const pageData = getFBPageData();
 
     const senderDetails = (displayConversation?.participants?.find((item)=>item.id!==pageData?.id));
-    console.log('userDetails', senderDetails);
     let userName = senderDetails?.name;
     userName = userName?.split(' ')
     const firstName =userName?.[0];

@@ -87,7 +87,6 @@ class AuthProvider extends React.PureComponent {
         API.auth().login({ email, password })
         .then(res=>{
           if(!res.data.status){
-            console.log('error',res)
             toast.error(res.data.message)
           }
           else {
@@ -109,7 +108,6 @@ class AuthProvider extends React.PureComponent {
       if (!!email && !!name && !!password) {
         API.auth().register({ email, name, password })
             .then(res => {
-              console.log('signupres',res)
               if(!res.data.status){
                 toast.error(res.data.message)
                 return;
@@ -130,13 +128,14 @@ class AuthProvider extends React.PureComponent {
     }
 
     logout = (history) => {
-      console.log('logout called')
       this.setState({ 
         token : null,
         authUser: null
       });
       localStorage.removeItem("mypegtoken");
       localStorage.removeItem("authpegUser");
+      localStorage.removeItem("fbPegToken");
+      localStorage.removeItem("fbPegPageData");
       API.auth().logout()
       history("/login");
     }
@@ -163,7 +162,6 @@ class AuthProvider extends React.PureComponent {
     getPageConversations= async (pageId,accessToken)=>{
       return API.fbLogin().getConversations({pageId,accessToken})
       .then(response=>{
-      console.log('dashboard',response);
       return response.data.conversations;
       }).catch(err=>console.log('err',err))
       // setPageConversations(conversationsWithPicUrl);

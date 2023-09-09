@@ -10,12 +10,10 @@ const FBIntegrate = () => {
     const user = getAuthUser();
     const navigate = useNavigate();
     // const [accessToken, setAccessToken] = React.useState('');
-    console.log('testingintegrate', user)
     // const [url,setUrl] = React.useState('');
     
     // const fbToken = getFBToken();
     const fbPageData = getFBPageData();
-    console.log('pageData',fbPageData)
 
     const deleteIntegration = (e) => {
             // setAccessToken('');
