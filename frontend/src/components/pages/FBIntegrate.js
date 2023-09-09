@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import queryString from "query-string";
 import { Link } from "react-router-dom";
 import env from "react-dotenv";
+import { backend_url } from "../auth/api";
 
 const FBIntegrate = () => {
     const { getAuthUser, getFBData, getFBToken, removeFBData,getFBPageData } = useContext(AuthContext);
@@ -51,7 +52,7 @@ const FBIntegrate = () => {
                         :
                         (<div className="flex flex-col gap-4">
                             <h6 className="text-xl text-center font-semibold">Facebook Page Integration</h6>
-                            <Link to={process.env.BACKEND_URL+'facebook/login'} className="bg-[#004f97] p-4 w-96 text-white text-center text-lg rounded-md">
+                            <Link to={backend_url+'facebook/login'} className="bg-[#004f97] p-4 w-96 text-white text-center text-lg rounded-md">
                                 Connect Page
                             </Link>
                         </div>)

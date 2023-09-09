@@ -3,6 +3,7 @@ import { AiOutlineAlignLeft, AiOutlineReload } from 'react-icons/ai';
 import { AuthContext } from "../auth/context";
 import axios from "axios";
 import env from "react-dotenv";
+import { backend_url } from "../auth/api";
 
 function calculateTimePassed(iso8601Timestamp) {
     const timestampDate = new Date(iso8601Timestamp);
@@ -31,7 +32,7 @@ const ConversationList = ({ selectedConversation, setSelectedConversation, pageC
     });
 
     const handleReload = async() => {
-        const response = await axios.post(process.env.BACKEND_URL+'facebook/reloadConversations',{fbPageData})
+        const response = await axios.post(backend_url+'facebook/reloadConversations',{fbPageData})
         if(response.data.status)
         reloadConversations(fbPageData?.id, fbPageData?.access_token);
     }
