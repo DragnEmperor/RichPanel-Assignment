@@ -39,7 +39,7 @@ router.post('/facebook/getCompleteData', async (req, res) => {
         const queryParams = new URLSearchParams({
             client_id: process.env.FB_APP_ID,
             client_secret: process.env.FB_SECRET,
-            redirect_uri: "https://localhost:3000/fbIntegrate/",
+            redirect_uri: process.env.FRONTEND_HOST,
             code: code,
         });
         const url = `https://graph.facebook.com/v17.0/oauth/access_token?${queryParams}`;
