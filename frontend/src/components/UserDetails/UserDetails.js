@@ -4,24 +4,25 @@ import { useContext } from 'react';
 
 const UserDetails = ({ displayConversation }) => {
 
-    const {getFBPageData} = useContext(AuthContext);
+    const { getFBPageData } = useContext(AuthContext);
     const pageData = getFBPageData();
 
-    const senderDetails = (displayConversation?.participants?.find((item)=>item.id!==pageData?.id));
+    const senderDetails = (displayConversation?.participants?.find((item) => item.id !== pageData?.id));
     let userName = senderDetails?.name;
     userName = userName?.split(' ')
-    const firstName =userName?.[0];
+    const firstName = userName?.[0];
     const lastName = userName?.slice(1).join(' ');;
 
     return (
         <div className="flex flex-col text-gray-700 h-full">
             <div className="bg-white flex flex-col items-center gap-4 py-10 px-28">
-                <img src={senderDetails?.picUrl} alt="user-details-pic" className="w-20 h-20 rounded-full object-cover" />
+                {senderDetails?.name && <img src={senderDetails?.picUrl ? senderDetails?.picUrl : "https://images.unsplash.com/photo-1693693928634-658db91ca093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80"} alt="user-details-pic" className="w-20 h-20 rounded-full object-cover" />}
                 <div className="text-center">
                     <p className="font-semibold text-2xl">{firstName}</p>
-                    <ul className="list-disc ml-4">
-                        <li className="text-gray-600 text-base font-semibold">Offline</li>
-                    </ul>
+                    {senderDetails?.name &&
+                        <ul className="list-disc ml-4">
+                            <li className="text-gray-600 text-base font-semibold">Offline</li>
+                        </ul>}
                 </div>
                 <div className="flex w-full gap-4 ">
                     <button className=" p-1 px-4 border-2 text-xl flex items-center justify-center font-semibold rounded-lg">

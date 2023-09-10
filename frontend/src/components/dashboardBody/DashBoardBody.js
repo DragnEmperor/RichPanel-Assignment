@@ -3,9 +3,10 @@ import Conversations from "../Conversations/ConversationList";
 import ConversationBody from "../Conversations/ConversationBody";
 import UserDetails from "../UserDetails/UserDetails";
 import { AuthContext } from "../auth/context";
+import { backend_url } from "../auth/api";
 
 
-const Dashboard = ({pageConversations,reloadConversations}) => {
+const Dashboard = ({pageConversations,reloadConversations,updateConversation,socket}) => {
 
    const [selectedConversation, setSelectedConversation] = useState(null);
    const [displayConversation, setDisplayConversation] = useState(null);
@@ -16,7 +17,13 @@ const Dashboard = ({pageConversations,reloadConversations}) => {
    const conversationHandler = async(index) => {
     setSelectedConversation(index);
     setDisplayConversation(pageConversations[index]);
+    socket.emit('convSelected',{convId:pageConversations?.[index]?.conversationId, pageData:fbPageData})
    }
+
+   useEffect(()=>{
+    if(!!selectedConversation)
+    setDisplayConversation(pageConversations[selectedConversation]);
+   },[pageConversations])
 
    const newPageConversations = pageConversations.map((conversation,index)=>({
     ...conversation,
@@ -30,7 +37,8 @@ const Dashboard = ({pageConversations,reloadConversations}) => {
             </div>
 
             <div className="flex flex-col w-1/2 border-x-2 border-gray-300">
-              <ConversationBody displayConversation={displayConversation} reloadConversations={reloadConversations}/>
+              <ConversationBody displayConversation={displayConversation}
+              socket={socket} updateConversation={updateConversation}/>
             </div>
 
             <div className="flex flex-col w-1/4">

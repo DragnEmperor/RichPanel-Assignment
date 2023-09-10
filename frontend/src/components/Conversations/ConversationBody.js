@@ -1,15 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState,useRef } from "react";
 import Message from "./Message";
 import { AuthContext } from "../auth/context";
-import axios from "axios";
 import { toast } from "react-hot-toast";
-import env from "react-dotenv";
-import { backend_url } from "../auth/api";
 
-const ConversationBody = ({ displayConversation, reloadConversations}) => {
+const ConversationBody = ({ displayConversation, socket,updateConversation}) => {
     const [message, setMessage] = useState("");
     const {getFBPageData} = useContext(AuthContext);
-    const [reloadPage, setReloadPage] = useState(false);
+    const messagesEndRef = useRef();
+    const [messagesDisplayed, setMessagesDisplayed] = useState(null);
     const fbPageData = getFBPageData();
     const receiverDetails = (displayConversation?.participants?.find((item)=>item.id!==displayConversation?.pageId));
     const username = receiverDetails?.name;
@@ -22,36 +20,60 @@ const ConversationBody = ({ displayConversation, reloadConversations}) => {
         }
       };
 
+      const scrollToBottom = () => {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      };
+
+    
       const submitData = async() => {
         console.log('Submitted:', message);
-        const response = await axios.post(backend_url+'facebook/sendMessage',{receiverId, text:message, pageData:fbPageData});
-        if(response?.data?.data?.error?.message.length>0){
-            toast.error(response?.data?.data?.error?.message);
-        }
-        if(response?.data?.data?.recipient_id?.length>0){
-            toast.success('Message Sent! Please reload using reload button');
-            reloadConversations(fbPageData?.id, fbPageData?.access_token);
-        }
+        socket.emit('sendMessage',{receiverId, text:message, pageData:fbPageData,convId:displayConversation?.conversationId})
         setMessage('');
       };
 
-      useEffect(() => {
-        setReloadPage(!reloadPage);
+      useEffect(()=>{
+        scrollToBottom();
+      }, [messagesDisplayed]);
+
+      useEffect(()=>{
+        socket.on('latest_messages', (latest_messages) => {
+            const res = JSON.parse(latest_messages);
+            const response = res.response;
+            if(response?.error?.message.length>0){
+                toast.error(response?.error?.message);
+            }
+            if(response?.recipient_id?.length>0){
+               updateConversation(res.messages,res.convId)
+            }
+          });
+        return () => socket.off('latest_messages');
+      },[socket])
+
+      useEffect(()=>{
+       setMessagesDisplayed(displayConversation?.messages);
       },[displayConversation])
+
+    //   useEffect(()=>{
+    //     socket.on('receive_message', (message) => {
+    //         console.log('receive message', JSON.parse(message));
+    //       });
+    //     return () => socket.off('receive_message');
+    //   },[socket])
 
     return (
         <React.Fragment>
-            <div className="relative h-full overflow-y-auto ">
+            <div className="relative h-full overflow-y-auto">
                 <div className=" border-b-2 border-b-gray-300 py-5 px-8 fixed bg-white w-[46.8%] z-10">
                     <h1 className="text-3xl font-bold ">{username}</h1>
                 </div>
                 <div className="w-full h-auto bg-[#f6f7f6] py-24">
-                    {displayConversation?.messages?.map((message, index) => {
+                    {messagesDisplayed?.map((message, index) => {
                         return(
                             <Message key={index} message={message} participants={displayConversation?.participants}/>
                         )
                      })}
                 </div>
+                <div ref={messagesEndRef}></div>
 
                 <div className={"px-4 absolute bottom-2 w-full " + (!!displayConversation ? "":" hidden")}>
                     <div className="fixed bottom-2 w-[46%]">

@@ -6,8 +6,10 @@ let fbprofile = null;
 const router = new express.Router();
 const auth = require('../middleware/auth');
 const axios = require('axios');
-const { processConversations } = require('../services/conversationService');
+const { processConversations, sendMessage } = require('../services/conversationService');
 const Conversation = require('../models/conversationSchema');
+// const cron = require('node-cron');
+// let userPageData = null;
 
 passport.serializeUser(function (user, cb) {
     cb(null, user);
@@ -70,8 +72,8 @@ router.post('/facebook/getCompleteData', async (req, res) => {
             method: 'GET',
         });
         const data3 = await response3.json();
+        // userPageData = data3.data[0];
         await processConversations(data3.data[0]);
-        
         return res.status(200).send({ status: true, fbToken: data1.access_token, pageData: data3.data })
     }
     catch (error) {
@@ -116,21 +118,28 @@ router.post('/facebook/reloadConversations',async(req,res)=>{
 router.post('/facebook/sendMessage',async(req,res)=>{
     try{
         const {receiverId, text, pageData} = req.body;
-        const queryParams = new URLSearchParams({
-            recipient : JSON.stringify({ id: receiverId }),
-            message : JSON.stringify({ text }),
-            messaging_type : 'RESPONSE',
-            access_token : pageData.access_token
-          });
-        const url = `https://graph.facebook.com/${pageData.id}/messages?${queryParams}`;
-        const response = await fetch(url,{
-            method:'POST',
-        });
-        const data = await response.json();
+        const data = await sendMessage(receiverId,text,pageData);
         return res.status(200).send({status:true,message:'Message Sent!',data});
     }catch(error){
         res.status(400).send({status:false,error:error.message});
     }
 })
 
+// async function latestConversations(userPageData) {
+//     try {
+//         if(userPageData){
+//             await processConversations(userPageData);
+//             console.log('Reloaded conversations successfully');
+//         }
+//         else
+//         throw 'No page data found!'
+//     } catch (error) {
+//       console.error('Error reloading conversations:', error);
+//     }
+//   }
+  
+// cron.schedule('*/5 * * * * *', () => {
+//     latestConversations(userPageData);
+// });
+ 
 module.exports = router;

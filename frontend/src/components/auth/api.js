@@ -1,6 +1,5 @@
 /* eslint-disable */ 
 import axios from "axios";
-import env from "react-dotenv";
 
 export const backend_url = "https://fb-backend-assign.onrender.com/";
 const http = axios.create({

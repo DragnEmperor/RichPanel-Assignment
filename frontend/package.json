@@ -16,6 +16,7 @@
     "react-router": "^6.15.0",
     "react-router-dom": "^6.15.0",
     "react-scripts": "5.0.1",
+    "socket.io-client": "^4.7.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -43,7 +44,10 @@
     ]
   },
   "react-dotenv": {
-    "whitelist": ["FB_APP_ID","FB_SECRET"]
+    "whitelist": [
+      "FB_APP_ID",
+      "FB_SECRET"
+    ]
   },
   "devDependencies": {
     "tailwindcss": "^3.3.3"

@@ -5,7 +5,7 @@ import { IoMdContacts } from 'react-icons/io';
 import { VscAzure } from 'react-icons/vsc';
 import { AuthContext } from "../auth/context";
 
-const SideBar = () => {
+const SideBar = ({picUrl}) => {
     const [activeIndex, setActiveIndex] = useState(1);
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
 
@@ -42,7 +42,7 @@ const SideBar = () => {
           window.removeEventListener("click", handleOutsideClick);
         };
       }, [isSubMenuOpen]);
-      
+
     return (
         <div className="flex flex-col justify-between h-full bg-[#004c94] w-24 pb-10">
                 <div className="flex flex-col gap-2">
@@ -70,7 +70,7 @@ const SideBar = () => {
                 <div className="relative submenu-container">
                     <img
                         className="w-10 h-10 rounded-full mx-auto object-cover cursor-pointer"
-                        src="https://images.unsplash.com/photo-1693693928634-658db91ca093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80"
+                        src={!!picUrl ? picUrl:"https://images.unsplash.com/photo-1693693928634-658db91ca093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80"}
                         alt="user-profile-pic"
                         onClick={toggleSubMenu}
                     />
